@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { JobApplication, ApplicationStatus } from './types';
+import { JobApplication, ApplicationStatus, Contact } from './types';
 import { INITIAL_JOBS } from './constants';
 import { JobCard } from './components/JobCard';
 import { AddJobForm } from './components/AddJobForm';
 import { Button } from './components/Button';
+import { ContactBook } from './components/ContactBook';
 
 const App: React.FC = () => {
   const [jobs, setJobs] = useState<JobApplication[]>(() => {
@@ -11,11 +12,21 @@ const App: React.FC = () => {
     return saved ? JSON.parse(saved) : INITIAL_JOBS;
   });
 
+  const [contacts, setContacts] = useState<Contact[]>(() => {
+      const saved = localStorage.getItem('autoapply_contacts');
+      return saved ? JSON.parse(saved) : [];
+  });
+
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showContactBook, setShowContactBook] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('autoapply_jobs', JSON.stringify(jobs));
   }, [jobs]);
+
+  useEffect(() => {
+      localStorage.setItem('autoapply_contacts', JSON.stringify(contacts));
+  }, [contacts]);
 
   const addJob = (job: JobApplication) => {
     setJobs([job, ...jobs]);
@@ -30,6 +41,16 @@ const App: React.FC = () => {
     if(window.confirm('Are you sure you want to delete this application?')) {
         setJobs(jobs.filter(j => j.id !== id));
     }
+  };
+
+  const addContact = (contact: Contact) => {
+      setContacts([...contacts, contact]);
+  };
+
+  const deleteContact = (id: string) => {
+      if(window.confirm('Delete this contact?')) {
+          setContacts(contacts.filter(c => c.id !== id));
+      }
   };
 
   const stats = {
@@ -52,16 +73,21 @@ const App: React.FC = () => {
                 <p className="text-xs text-gray-500">WhatsApp Automation Assistant</p>
              </div>
           </div>
-          <div className="hidden md:flex items-center space-x-6 text-sm text-gray-600">
-             <div className="flex flex-col items-center">
-                <span className="font-bold text-gray-900">{stats.total}</span>
-                <span className="text-xs">Targets</span>
-             </div>
-             <div className="h-8 w-px bg-gray-200"></div>
-             <div className="flex flex-col items-center">
-                <span className="font-bold text-green-600">{stats.sent}</span>
-                <span className="text-xs">Sent</span>
-             </div>
+          <div className="flex items-center space-x-4">
+              <Button variant="secondary" onClick={() => setShowContactBook(true)}>
+                  📒 Contact Book
+              </Button>
+              <div className="hidden md:flex items-center space-x-6 text-sm text-gray-600 border-l pl-4 border-gray-200">
+                <div className="flex flex-col items-center">
+                    <span className="font-bold text-gray-900">{stats.total}</span>
+                    <span className="text-xs">Targets</span>
+                </div>
+                <div className="h-8 w-px bg-gray-200"></div>
+                <div className="flex flex-col items-center">
+                    <span className="font-bold text-green-600">{stats.sent}</span>
+                    <span className="text-xs">Sent</span>
+                </div>
+              </div>
           </div>
         </div>
       </header>
@@ -78,11 +104,10 @@ const App: React.FC = () => {
              <h2 className="text-lg font-semibold text-indigo-900">How to automate your applications</h2>
              <p className="text-indigo-700 text-sm mt-1 max-w-3xl">
                This tool helps you scale your job search using AI.
-               1. <strong>Add a Target</strong> with the company details and WhatsApp number.
-               2. <strong>Generate Message</strong> using Gemini AI to create a personalized pitch.
-               3. <strong>Click Send</strong> to open WhatsApp with your pre-filled message ready to go.
+               1. <strong>Add a Target</strong> (manually or from Contact Book).
+               2. <strong>Generate Message</strong> using Gemini AI.
+               3. <strong>Click Send</strong> to launch WhatsApp.
              </p>
-             <p className="text-xs text-indigo-500 mt-2 italic">Note: Browser automation security prevents "1-click fully background sending". This tool uses the official Click-to-Chat protocol.</p>
            </div>
         </div>
 
@@ -97,8 +122,22 @@ const App: React.FC = () => {
         {/* Form Modal / Inline */}
         {showAddForm && (
           <div className="mb-8 animate-fade-in-down">
-            <AddJobForm onAdd={addJob} onCancel={() => setShowAddForm(false)} />
+            <AddJobForm 
+                onAdd={addJob} 
+                onCancel={() => setShowAddForm(false)} 
+                contacts={contacts}
+            />
           </div>
+        )}
+
+        {/* Contact Book Modal */}
+        {showContactBook && (
+            <ContactBook 
+                contacts={contacts}
+                onAdd={addContact}
+                onDelete={deleteContact}
+                onClose={() => setShowContactBook(false)}
+            />
         )}
 
         {/* Grid */}

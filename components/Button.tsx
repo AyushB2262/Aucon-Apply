@@ -3,6 +3,7 @@ import React from 'react';
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'danger' | 'whatsapp';
   isLoading?: boolean;
+  href?: string; // Add href support
 }
 
 export const Button: React.FC<ButtonProps> = ({ 
@@ -11,9 +12,10 @@ export const Button: React.FC<ButtonProps> = ({
   isLoading = false, 
   className = '', 
   disabled,
+  href,
   ...props 
 }) => {
-  const baseStyle = "inline-flex items-center justify-center px-4 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 shadow-sm";
+  const baseStyle = "inline-flex items-center justify-center px-4 py-2 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 shadow-sm decoration-none";
   
   const variants = {
     primary: "border-transparent text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500",
@@ -22,9 +24,19 @@ export const Button: React.FC<ButtonProps> = ({
     whatsapp: "border-transparent text-white bg-[#25D366] hover:bg-[#128C7E] focus:ring-green-500",
   };
 
+  const classes = `${baseStyle} ${variants[variant]} ${className} ${disabled || isLoading ? 'opacity-50 cursor-not-allowed' : ''}`;
+
+  if (href && !disabled) {
+    return (
+      <a href={href} className={classes} target="_blank" rel="noopener noreferrer">
+        {children}
+      </a>
+    );
+  }
+
   return (
     <button
-      className={`${baseStyle} ${variants[variant]} ${className} ${disabled || isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+      className={classes}
       disabled={disabled || isLoading}
       {...props}
     >

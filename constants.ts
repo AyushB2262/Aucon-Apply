@@ -8,6 +8,7 @@ export const INITIAL_JOBS: JobApplication[] = [
     companyName: 'TechFlow Solutions',
     contactName: 'Sarah Jenkins',
     phoneNumber: '15550192834',
+    jobTitle: 'Senior React Engineer',
     jobDescription: 'Looking for a Senior React Engineer with experience in Tailwind and AI integration.',
     generatedMessage: '',
     status: ApplicationStatus.DRAFT,
