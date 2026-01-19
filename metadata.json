@@ -1,0 +1,5 @@
+{
+  "name": "Copy of AutoApply AI",
+  "description": "An AI-powered assistant to manage and automate drafting job application messages for WhatsApp. It uses Gemini 3 Flash to personalize outreach and the WhatsApp Click-to-Chat protocol for delivery.",
+  "requestFramePermissions": []
+}
